@@ -1,9 +1,11 @@
 import React from "react";
-import { LucideCrop as LucideProps } from "lucide-react";
+import { LucideProps } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export interface IconProps extends LucideProps {
+export interface IconProps {
   name: string;
+  className?: string;
+  [key: string]: any; // Allow any other props
 }
 
 export const Icon = ({ name, className, ...props }: IconProps) => {

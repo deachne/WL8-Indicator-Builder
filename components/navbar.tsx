@@ -4,14 +4,23 @@ import { useState } from "react";
 import Link from "next/link";
 import { Icon } from "@/components/ui/icon";
 import { cn } from "@/lib/utils";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const pathname = usePathname();
+  const router = useRouter();
 
   const isActive = (path: string) => {
     return pathname === path;
+  };
+  
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/documentation/search?q=${encodeURIComponent(searchQuery)}`);
+    }
   };
 
   return (
@@ -67,14 +76,18 @@ export function Navbar() {
           </div>
 
           {/* Search Bar */}
-          <div className="hidden md:flex items-center bg-gray-700 rounded-full px-3 py-1">
+          <form onSubmit={handleSearch} className="hidden md:flex items-center bg-gray-700 rounded-full px-3 py-1">
             <input
               type="text"
-              placeholder="Search..."
+              placeholder="Search docs..."
               className="bg-transparent border-none focus:outline-none text-white text-sm w-32"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <Icon name="fa-search" className="text-gray-400 ml-2 h-4 w-4" />
-          </div>
+            <button type="submit" className="bg-transparent border-none">
+              <Icon name="fa-search" className="text-gray-400 ml-2 h-4 w-4" />
+            </button>
+          </form>
 
           {/* Mobile Menu Button */}
           <div className="md:hidden">
@@ -131,14 +144,18 @@ export function Navbar() {
             >
               <Icon name="fa-question-circle" className="mr-2 h-4 w-4" /> Q&A
             </Link>
-            <div className="flex items-center bg-gray-700 rounded-full px-3 py-1 mt-2">
+            <form onSubmit={handleSearch} className="flex items-center bg-gray-700 rounded-full px-3 py-1 mt-2">
               <input
                 type="text"
-                placeholder="Search..."
+                placeholder="Search docs..."
                 className="bg-transparent border-none focus:outline-none text-white text-sm w-full"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <Icon name="fa-search" className="text-gray-400 ml-2 h-4 w-4" />
-            </div>
+              <button type="submit" className="bg-transparent border-none">
+                <Icon name="fa-search" className="text-gray-400 ml-2 h-4 w-4" />
+              </button>
+            </form>
           </div>
         </div>
       </div>

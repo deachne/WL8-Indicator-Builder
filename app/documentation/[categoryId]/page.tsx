@@ -5,9 +5,23 @@ import { DocumentationNav } from "@/components/documentation-nav";
 import { getDocCategories, getDocNavItems } from "@/lib/documentation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 
-export default function DocumentationPage() {
+interface CategoryPageProps {
+  params: {
+    categoryId: string;
+  };
+}
+
+export default function CategoryPage({ params }: CategoryPageProps) {
+  const { categoryId } = params;
   const categories = getDocCategories();
+  const category = categories.find((cat) => cat.id === categoryId);
+  
+  if (!category) {
+    notFound();
+  }
+  
   const navItems = getDocNavItems();
   
   return (
@@ -17,10 +31,12 @@ export default function DocumentationPage() {
       {/* Documentation Page Header */}
       <div className="bg-gradient-to-br from-[#1a365d] to-[#0d9488] text-white py-12">
         <div className="container mx-auto px-6">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">WL8 Documentation</h1>
-          <p className="text-xl max-w-3xl">
-            Explore the complete Wealth-Lab 8 API documentation, frameworks, and examples to help build your custom indicators.
-          </p>
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">{category.title}</h1>
+          {category.description && (
+            <p className="text-xl max-w-3xl">
+              {category.description}
+            </p>
+          )}
         </div>
       </div>
       
@@ -29,20 +45,20 @@ export default function DocumentationPage() {
         sidebar={<DocumentationNav items={navItems} />}
       >
         <div className="grid gap-6">
-          <h2 className="text-2xl font-bold">Documentation Categories</h2>
+          <h2 className="text-2xl font-bold">{category.title} Documentation</h2>
           <div className="grid gap-6 md:grid-cols-2">
-            {categories.map((category) => (
-              <Link key={category.id} href={`/documentation/${category.id}`} className="block">
+            {category.items.map((item) => (
+              <Link key={item.id} href={`/documentation/${categoryId}/${item.id}`} className="block">
                 <Card className="h-full transition-all hover:shadow-md">
                   <CardHeader>
-                    <CardTitle>{category.title}</CardTitle>
-                    {category.description && (
-                      <CardDescription>{category.description}</CardDescription>
+                    <CardTitle>{item.title}</CardTitle>
+                    {item.description && (
+                      <CardDescription>{item.description}</CardDescription>
                     )}
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground">
-                      {category.items.length} {category.items.length === 1 ? 'document' : 'documents'}
+                      View documentation
                     </p>
                   </CardContent>
                 </Card>
@@ -55,4 +71,12 @@ export default function DocumentationPage() {
       <Footer />
     </main>
   );
+}
+
+// Generate static paths for all categories
+export function generateStaticParams() {
+  const categories = getDocCategories();
+  return categories.map((category) => ({
+    categoryId: category.id,
+  }));
 }
