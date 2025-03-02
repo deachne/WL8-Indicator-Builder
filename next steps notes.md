@@ -6,9 +6,9 @@ The WL8 Indicator Builder is a platform for creating, testing, and sharing indic
 ## Tech Stack
 - **Frontend**: Next.js with TypeScript
 - **Styling**: Tailwind CSS
-- **RAG System**: ChromaDB (planned)
+- **RAG System**: ChromaDB ✅
 - **Code Editor**: Monaco Editor ✅
-- **Chart Visualization**: TradingView Lightweight Charts (planned)
+- **Chart Visualization**: TradingView Lightweight Charts ✅
 
 ## Repository
 - GitHub: [https://github.com/deachne/WL8-Indicator-Builder](https://github.com/deachne/WL8-Indicator-Builder)
@@ -20,16 +20,37 @@ wl8-indicator-builder/
 │   ├── page.tsx            # Homepage
 │   ├── documentation/      # Documentation browser
 │   ├── builder/            # Indicator builder
-│   └── qa/                 # Q&A platform
+│   ├── qa/                 # Q&A platform
+│   └── api/                # API routes for RAG system
+│       ├── init-rag/       # Initialize RAG system
+│       ├── rag/            # Query RAG system
+│       └── suggestions/    # Get document suggestions
 ├── components/             # Reusable components
 │   ├── ui/                 # UI components
+│   ├── ai-assistant.tsx    # AI assistant component
+│   ├── chart-preview.tsx   # Chart preview component
+│   ├── code-display.tsx    # Code display component
+│   ├── documentation-*.tsx # Documentation components
 │   ├── feature-card.tsx    # Feature card component
 │   ├── footer.tsx          # Footer component
 │   ├── hero-section.tsx    # Hero section component
 │   ├── navbar.tsx          # Navigation bar component
+│   ├── rag-initializer.tsx # RAG initializer component
 │   └── step-item.tsx       # Step item component
+├── docs/                   # Imported documentation
+│   ├── api/                # API documentation
+│   ├── framework/          # Framework documentation
+│   └── index.json          # Documentation index
 ├── hooks/                  # Custom React hooks
-└── lib/                    # Utility functions
+├── lib/                    # Utility functions
+│   ├── chroma-client.ts    # ChromaDB client
+│   ├── documentation.ts    # Documentation utilities
+│   ├── enhanced-rag.ts     # Enhanced RAG system
+│   └── rag.ts              # Original RAG system
+└── scripts/                # Utility scripts
+    ├── import-docs.js      # Import documentation from GitHub
+    ├── run-chroma.js       # Run ChromaDB server
+    └── import-chroma.js    # Import documentation into ChromaDB
 ```
 
 ## Implementation Plan
@@ -61,7 +82,7 @@ wl8-indicator-builder/
 - [x] Create API endpoints for querying and suggestions
 - [x] Develop AI assistant chat component
 - [x] Integrate AI assistant with documentation browser
-- [ ] Replace mock implementation with ChromaDB (future enhancement)
+- [x] Replace mock implementation with ChromaDB
 
 ### Phase 5: Q&A Platform ✅
 - [x] Create placeholder for Q&A page
@@ -83,24 +104,31 @@ wl8-indicator-builder/
   - IntelliSense and code completion for C# and WealthLab functions
   - Error diagnostics for basic syntax errors
   - Toggle between read-only and editable modes
-- Chart visualization and template selection
+- Chart visualization with TradingView Lightweight Charts integration, featuring:
+  - Real-time chart updates based on selected indicators
+  - Dark theme to match the UI
+  - Support for multiple technical indicators (SMA, EMA, RSI, MACD, Bollinger Bands)
+  - Responsive design that adapts to container size
+  - Error handling for smooth indicator transitions
 - AI assistant integrated with documentation, builder, and Q&A pages
-- Mock RAG system implemented for document retrieval
-- API endpoints for querying and suggestions
+- Enhanced RAG system with ChromaDB integration and code-aware document processing
+- API endpoints for querying and suggestions with automatic fallback mechanism
 - Responsive layout with optimized UI components
+- Scripts for importing documentation and managing the ChromaDB server
 
 ## Next Steps
 As outlined in the updated PROJECT.md, the next steps for the project are:
 
-### Indicator Builder Enhancement
+### Indicator Builder Enhancement ✅
 - ✅ Implement Monaco editor for C# code editing
-- Integrate TradingView charts for visualization
-- Create console output component for debugging
+- ✅ Integrate TradingView charts for visualization
 
 ### RAG System Improvements
-- Replace the mock implementation with ChromaDB for better document vectorization
-- Add support for more advanced retrieval techniques
+- ✅ Replace the mock implementation with ChromaDB for better document vectorization
+- ✅ Implement code-aware document processing
+- Add support for more advanced retrieval techniques like re-ranking
 - Implement code generation capabilities based on documentation context
+- Implement AI model selection feature to allow choosing between OpenAI and Anthropic models for indicator building and assistance
 
 ### User Experience
 - Implement user authentication for saving and sharing indicators
@@ -113,21 +141,47 @@ The current implementation provides a solid foundation for these future enhancem
 - The WL8 documentation is available in the GitHub repository at https://github.com/deachne/WL8-pkm
 - The documentation includes 75 API reference files and 27 framework files
 - The design follows a blue/teal color scheme for a professional look
-- The mock RAG system can be replaced with ChromaDB in the future for better document vectorization
-- The AI assistant currently uses a simple retrieval mechanism but can be enhanced with more advanced techniques
+- The RAG system now uses ChromaDB for better document vectorization and retrieval
+- The AI assistant uses a code-aware retrieval mechanism that preserves code examples and their context
 
 ## RAG System Implementation
-The current RAG system implementation uses a mock approach that leverages the existing search functionality. This provides immediate functionality while allowing for future enhancements. Key components include:
+The RAG system has been enhanced with ChromaDB integration and code-aware document processing. Key components include:
 
-1. **Document Retrieval**: Uses the existing search function to find relevant documentation based on user queries
-2. **AI Assistant**: Provides contextual responses based on retrieved documentation
-3. **Suggestions**: Offers related documentation based on the current context
+1. **ChromaDB Integration**: 
+   - Vector database for efficient semantic search
+   - Automatic fallback to in-memory system if ChromaDB is unavailable
+   - Batched document processing for handling large documentation sets
+   - Configurable similarity search parameters
+
+2. **Code-Aware Document Processing**:
+   - Intelligent extraction of code blocks with their surrounding context
+   - Special handling for code examples to preserve their integrity
+   - Metadata enrichment for better retrieval and filtering
+   - Separate storage of code blocks and explanatory text
+
+3. **Enhanced Retrieval**:
+   - Semantic search using embeddings for better relevance
+   - Hybrid search combining keyword and semantic approaches
+   - Filtering by document type, language, and other metadata
+   - Prioritization of code examples for programming-related queries
+
+4. **AI Assistant Integration**:
+   - Contextual responses based on retrieved documentation
+   - Presentation of code examples with explanatory text
+   - Suggestions for related documentation
+   - Automatic detection of ChromaDB availability
+
+The system includes scripts for:
+- Importing documentation from GitHub with code-aware processing
+- Running a ChromaDB server for vector storage
+- Importing processed documents into ChromaDB
+- Testing the RAG system with various queries
 
 Future enhancements to the RAG system could include:
-- Replacing the mock implementation with ChromaDB for better document vectorization
-- Adding support for more advanced retrieval techniques
+- Adding support for more advanced retrieval techniques like re-ranking
 - Implementing code generation capabilities based on documentation context
 - Enhancing the AI assistant with more domain-specific knowledge
+- Adding user feedback mechanisms to improve retrieval quality
 
 ## Monaco Editor Implementation
 The Monaco Editor implementation enhances the code editing experience with the following features:
@@ -146,3 +200,25 @@ The Monaco Editor implementation enhances the code editing experience with the f
 6. **Editor Controls**: Toggle between read-only and editable modes
 
 This implementation significantly improves the developer experience when creating and editing indicators, making the process more efficient and user-friendly.
+
+## TradingView Lightweight Charts Implementation
+The TradingView Lightweight Charts implementation enhances the chart visualization experience with the following features:
+
+1. **Candlestick Charts**: Professional-grade candlestick charts for price visualization
+2. **Technical Indicators**: Support for multiple technical indicators:
+   - Simple Moving Average (SMA)
+   - Exponential Moving Average (EMA)
+   - Relative Strength Index (RSI)
+   - Moving Average Convergence Divergence (MACD)
+   - Bollinger Bands
+3. **Responsive Design**: Charts automatically resize to fit their container
+4. **Dark Theme**: Styled to match the application's dark theme
+5. **Real-time Updates**: Charts update in real-time when:
+   - Different indicators are selected
+   - Template changes are made
+   - Symbol selection changes
+6. **Error Handling**: Robust error handling for smooth indicator transitions
+7. **Interactive Elements**: Time scale navigation, crosshair for precise readings
+8. **Performance Optimization**: Efficient rendering for smooth performance
+
+This implementation provides a professional-grade charting solution that allows users to visualize their indicators directly in the application, making it easier to understand and refine their trading strategies.

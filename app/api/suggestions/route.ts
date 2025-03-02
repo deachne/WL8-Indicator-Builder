@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getEnhancedSuggestedDocumentation } from '@/lib/enhanced-rag';
-import { queryChromaDB } from '@/lib/chroma-client';
+import { getSupabaseSuggestedDocumentation } from '@/lib/supabase-rag';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,27 +16,17 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    // Try to use ChromaDB first
-    const chromaResult = await queryChromaDB(query, { k: 5 });
+    // Try to use Supabase first
+    const supabaseResult = await getSupabaseSuggestedDocumentation(query);
     
-    if (chromaResult.success && chromaResult.results && chromaResult.results.length > 0) {
-      // Format the results as suggestions
-      const suggestions = chromaResult.results.map((doc, i) => ({
-        id: doc.metadata.id || 'unknown',
-        title: doc.metadata.title || 'Unknown Title',
-        category: doc.metadata.category || 'unknown',
-        url: doc.metadata.url || '#',
-        score: 1 - (i * 0.1), // Mock relevance score
-        type: doc.metadata.contentType || 'text',
-      }));
-      
+    if (supabaseResult.success && supabaseResult.suggestions && supabaseResult.suggestions.length > 0) {
       return NextResponse.json({
-        suggestions,
-        usingChroma: true
+        suggestions: supabaseResult.suggestions,
+        usingSupabase: true
       });
     }
     
-    // Fall back to enhanced RAG system if ChromaDB fails or returns no results
+    // Fall back to enhanced RAG system if Supabase fails or returns no results
     console.log('Falling back to enhanced RAG system for suggestions');
     const result = await getEnhancedSuggestedDocumentation(query);
     
@@ -49,7 +39,7 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({
       suggestions: result.suggestions,
-      usingChroma: false
+      usingSupabase: false
     });
   } catch (error) {
     console.error('Error in suggestions API route:', error);

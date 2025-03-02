@@ -6,7 +6,7 @@ interface RagStatus {
   status: "loading" | "success" | "error";
   message: string;
   documentCount?: number;
-  usingChroma?: boolean;
+  usingSupabase?: boolean;
   collectionName?: string;
 }
 
@@ -27,7 +27,7 @@ export function RagInitializer() {
             status: "success",
             message: data.message,
             documentCount: data.documentCount,
-            usingChroma: data.usingChroma,
+            usingSupabase: data.usingSupabase,
             collectionName: data.collectionName,
           });
           
@@ -35,7 +35,7 @@ export function RagInitializer() {
           console.log("RAG System Initialized:", {
             message: data.message,
             documentCount: data.documentCount,
-            usingChroma: data.usingChroma,
+            usingSupabase: data.usingSupabase,
             collectionName: data.collectionName,
           });
         } else {

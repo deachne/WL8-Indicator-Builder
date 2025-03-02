@@ -1,29 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { initializeEnhancedRagSystem } from '@/lib/enhanced-rag';
-import { initializeChromaDB, getChromaCollectionInfo } from '@/lib/chroma-client';
+import { initializeSupabaseRagSystem } from '@/lib/supabase-rag';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-    // Try to initialize ChromaDB first
-    const chromaResult = await initializeChromaDB();
+    // Try to initialize Supabase first
+    const supabaseResult = await initializeSupabaseRagSystem();
     
-    if (chromaResult.success) {
-      // If ChromaDB initialization is successful, get collection info
-      const collectionInfo = await getChromaCollectionInfo();
-      
-      if (collectionInfo.success) {
-        return NextResponse.json({
-          message: 'ChromaDB RAG system initialized successfully',
-          documentCount: collectionInfo.documentCount || 0,
-          collectionName: collectionInfo.collectionName,
-          usingChroma: true
-        });
-      }
+    if (supabaseResult.success) {
+      return NextResponse.json({
+        message: 'Supabase RAG system initialized successfully',
+        documentCount: supabaseResult.documentCount || 0,
+        usingSupabase: true
+      });
     }
     
-    // Fall back to enhanced RAG system if ChromaDB fails
+    // Fall back to enhanced RAG system if Supabase fails
     console.log('Falling back to enhanced RAG system');
     const result = await initializeEnhancedRagSystem();
     
@@ -37,7 +31,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       message: result.message,
       documentCount: result.documentCount || 0,
-      usingChroma: false
+      usingSupabase: false
     });
   } catch (error) {
     console.error('Error initializing RAG system:', error);

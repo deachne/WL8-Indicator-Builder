@@ -3,21 +3,34 @@
 /**
  * Import Documents to ChromaDB Script
  * 
- * This script imports processed documents into ChromaDB.
- * It requires that the ChromaDB server is running and that
- * the documents have been processed by the import-docs.js script.
+ * This script imports processed documents into ChromaDB using the JavaScript client.
+ * It requires that the documents have been processed by the import-docs.js script.
  * 
  * Usage:
  *   node scripts/import-chroma.js
  */
 
+// Load environment variables from .env file
+require('dotenv').config();
+
 const path = require('path');
 const fs = require('fs');
-const { execSync } = require('child_process');
+const { ChromaClient } = require('chromadb');
+const { OpenAIEmbeddingFunction } = require('chromadb');
 
 // Configuration
 const DOCS_DIR = path.join(__dirname, '..', 'docs');
 const PROCESSED_DOCS_PATH = path.join(DOCS_DIR, 'processed-documents.json');
+const COLLECTION_NAME = "wl8_documentation";
+
+// Check for OpenAI API key
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+if (!OPENAI_API_KEY) {
+  console.error('OPENAI_API_KEY environment variable is not set');
+  console.error('Please set it before running this script:');
+  console.error('export OPENAI_API_KEY=your_api_key_here');
+  process.exit(1);
+}
 
 // Main function
 async function main() {
@@ -30,54 +43,72 @@ async function main() {
       process.exit(1);
     }
     
-    // Read processed documents to get count
+    // Read processed documents
     const processedDocsJson = fs.readFileSync(PROCESSED_DOCS_PATH, 'utf8');
     const processedDocs = JSON.parse(processedDocsJson);
     
     console.log(`Found ${processedDocs.length} processed documents to import`);
     
-    // Run the TypeScript import function using ts-node
-    console.log('Importing documents to ChromaDB...');
+    // Initialize ChromaDB client
+    console.log('Initializing ChromaDB client in memory mode...');
+    const client = new ChromaClient({ path: "memory" });
     
-    // Create a temporary script to import documents
-    const tempScriptPath = path.join(__dirname, 'temp-import.js');
+    // Initialize embedding function with OpenAI
+    const embedder = new OpenAIEmbeddingFunction({
+      openai_api_key: OPENAI_API_KEY,
+      openai_model: "text-embedding-3-small"
+    });
     
-    const scriptContent = `
-    // This is a temporary script to import documents to ChromaDB
-    const { importDocumentsToChroma } = require('../lib/chroma-client');
-    
-    async function runImport() {
-      try {
-        const result = await importDocumentsToChroma();
-        if (result.success) {
-          console.log(result.message);
-          process.exit(0);
-        } else {
-          console.error(result.message);
-          process.exit(1);
-        }
-      } catch (error) {
-        console.error('Error importing documents:', error);
-        process.exit(1);
-      }
-    }
-    
-    runImport();
-    `;
-    
-    fs.writeFileSync(tempScriptPath, scriptContent);
-    
+    // Get or create collection
+    console.log(`Getting or creating collection: ${COLLECTION_NAME}`);
+    let collection;
     try {
-      // Run the script with ts-node
-      execSync(`npx ts-node ${tempScriptPath}`, { stdio: 'inherit' });
-      console.log('Import completed successfully');
+      collection = await client.getCollection({
+        name: COLLECTION_NAME,
+        embeddingFunction: embedder
+      });
+      console.log(`Collection ${COLLECTION_NAME} exists, using existing collection`);
     } catch (error) {
-      console.error('Error running import script:', error);
-      process.exit(1);
-    } finally {
-      // Clean up temporary script
-      fs.unlinkSync(tempScriptPath);
+      console.log(`Collection ${COLLECTION_NAME} does not exist, creating new collection`);
+      collection = await client.createCollection({
+        name: COLLECTION_NAME,
+        embeddingFunction: embedder,
+        metadata: { "hnsw:space": "cosine" }
+      });
     }
+    
+    // Process documents in batches to avoid memory issues
+    const batchSize = 100;
+    const batches = [];
+    for (let i = 0; i < processedDocs.length; i += batchSize) {
+      batches.push(processedDocs.slice(i, i + batchSize));
+    }
+    
+    console.log(`Processing ${batches.length} batches of documents (batch size: ${batchSize})`);
+    
+    // Add documents to ChromaDB in batches
+    let totalAdded = 0;
+    for (let i = 0; i < batches.length; i++) {
+      const batch = batches[i];
+      console.log(`Adding batch ${i + 1}/${batches.length} (${batch.length} documents)...`);
+      
+      // Prepare documents for ChromaDB
+      const ids = batch.map((doc, index) => `${doc.metadata.id}-${doc.metadata.chunkIndex || index}`);
+      const documents = batch.map(doc => doc.pageContent);
+      const metadatas = batch.map(doc => doc.metadata);
+      
+      // Add documents to collection
+      await collection.add({
+        ids,
+        documents,
+        metadatas
+      });
+      
+      totalAdded += batch.length;
+      console.log(`Progress: ${Math.round((totalAdded / processedDocs.length) * 100)}% (${totalAdded}/${processedDocs.length})`);
+    }
+    
+    console.log(`Successfully imported ${totalAdded} documents to ChromaDB`);
     
   } catch (error) {
     console.error('Error importing documents to ChromaDB:', error);

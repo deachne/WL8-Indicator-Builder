@@ -456,7 +456,7 @@ export default function IndicatorBuilderPage() {
           </div>
           
           {/* Right Column: AI Assistant */}
-          <div className="lg:col-span-2 h-full">
+          <div className="lg:col-span-2 h-full flex flex-col">
             <AiAssistant 
               initialContext={`WL8 indicator development for ${template} template with ${symbol}`} 
               placeholder="Describe the indicator you want to create..." 

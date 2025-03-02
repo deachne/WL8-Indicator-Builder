@@ -6,7 +6,7 @@ The WL8 Indicator Builder is a platform for creating, testing, and sharing indic
 ## Tech Stack
 - **Frontend**: Next.js with TypeScript
 - **Styling**: Tailwind CSS
-- **RAG System**: ChromaDB ✅
+- **RAG System**: Supabase with pgvector ✅ (migrated from ChromaDB)
 - **Code Editor**: Monaco Editor ✅
 - **Chart Visualization**: TradingView Lightweight Charts ✅
 
@@ -43,14 +43,20 @@ wl8-indicator-builder/
 │   └── index.json          # Documentation index
 ├── hooks/                  # Custom React hooks
 ├── lib/                    # Utility functions
-│   ├── chroma-client.ts    # ChromaDB client
+│   ├── chroma-client.ts    # ChromaDB client (legacy)
 │   ├── documentation.ts    # Documentation utilities
 │   ├── enhanced-rag.ts     # Enhanced RAG system
-│   └── rag.ts              # Original RAG system
+│   ├── rag.ts              # Original RAG system
+│   ├── reranker.ts         # Re-ranking implementation
+│   ├── supabase-client.ts  # Supabase client
+│   └── supabase-rag.ts     # Supabase RAG implementation
 └── scripts/                # Utility scripts
     ├── import-docs.js      # Import documentation from GitHub
-    ├── run-chroma.js       # Run ChromaDB server
-    └── import-chroma.js    # Import documentation into ChromaDB
+    ├── run-chroma.js       # Run ChromaDB server (legacy)
+    ├── import-chroma.js    # Import documentation into ChromaDB (legacy)
+    ├── import-supabase.js  # Import documentation into Supabase
+    ├── verify-supabase.js  # Verify Supabase setup
+    └── create-supabase-schema.sql # SQL schema for Supabase
 ```
 
 ## Implementation Plan
@@ -83,6 +89,7 @@ wl8-indicator-builder/
 - [x] Develop AI assistant chat component
 - [x] Integrate AI assistant with documentation browser
 - [x] Replace mock implementation with ChromaDB
+- [x] Migrate from ChromaDB to Supabase for improved reliability and scalability
 
 ### Phase 5: Q&A Platform ✅
 - [x] Create placeholder for Q&A page
@@ -104,31 +111,33 @@ wl8-indicator-builder/
   - IntelliSense and code completion for C# and WealthLab functions
   - Error diagnostics for basic syntax errors
   - Toggle between read-only and editable modes
-- Chart visualization with TradingView Lightweight Charts integration, featuring:
+- Chart visualization with TradingView Lightweight Charts integration (complete), featuring:
   - Real-time chart updates based on selected indicators
   - Dark theme to match the UI
   - Support for multiple technical indicators (SMA, EMA, RSI, MACD, Bollinger Bands)
   - Responsive design that adapts to container size
   - Error handling for smooth indicator transitions
 - AI assistant integrated with documentation, builder, and Q&A pages
-- Enhanced RAG system with ChromaDB integration and code-aware document processing
+- Enhanced RAG system with Supabase integration and code-aware document processing
+- Hybrid re-ranking system for improved retrieval quality
 - API endpoints for querying and suggestions with automatic fallback mechanism
 - Responsive layout with optimized UI components
-- Scripts for importing documentation and managing the ChromaDB server
+- Scripts for importing documentation and managing vector storage
 
 ## Next Steps
 As outlined in the updated PROJECT.md, the next steps for the project are:
 
-### Indicator Builder Enhancement
+### Indicator Builder Enhancement ✅
 - ✅ Implement Monaco editor for C# code editing
 - ✅ Integrate TradingView charts for visualization
-- Create console output component for debugging
 
 ### RAG System Improvements
 - ✅ Replace the mock implementation with ChromaDB for better document vectorization
 - ✅ Implement code-aware document processing
-- Add support for more advanced retrieval techniques like re-ranking
+- ✅ Migrate from ChromaDB to Supabase with pgvector for improved reliability and scalability
+- ✅ Implement hybrid re-ranking for better retrieval quality
 - Implement code generation capabilities based on documentation context
+- Implement AI model selection feature to allow choosing between OpenAI and Anthropic models for indicator building and assistance
 
 ### User Experience
 - Implement user authentication for saving and sharing indicators
@@ -141,15 +150,16 @@ The current implementation provides a solid foundation for these future enhancem
 - The WL8 documentation is available in the GitHub repository at https://github.com/deachne/WL8-pkm
 - The documentation includes 75 API reference files and 27 framework files
 - The design follows a blue/teal color scheme for a professional look
-- The RAG system now uses ChromaDB for better document vectorization and retrieval
+- The RAG system now uses Supabase with pgvector for better document vectorization and retrieval
 - The AI assistant uses a code-aware retrieval mechanism that preserves code examples and their context
 
 ## RAG System Implementation
-The RAG system has been enhanced with ChromaDB integration and code-aware document processing. Key components include:
+The RAG system has been enhanced with Supabase integration and code-aware document processing. Key components include:
 
-1. **ChromaDB Integration**: 
-   - Vector database for efficient semantic search
-   - Automatic fallback to in-memory system if ChromaDB is unavailable
+1. **Supabase with pgvector Integration**: 
+   - PostgreSQL-based vector database for efficient semantic search
+   - Managed service with no server maintenance required
+   - Automatic fallback to in-memory system if Supabase is unavailable
    - Batched document processing for handling large documentation sets
    - Configurable similarity search parameters
 
@@ -162,6 +172,7 @@ The RAG system has been enhanced with ChromaDB integration and code-aware docume
 3. **Enhanced Retrieval**:
    - Semantic search using embeddings for better relevance
    - Hybrid search combining keyword and semantic approaches
+   - Re-ranking system to improve result quality
    - Filtering by document type, language, and other metadata
    - Prioritization of code examples for programming-related queries
 
@@ -169,16 +180,17 @@ The RAG system has been enhanced with ChromaDB integration and code-aware docume
    - Contextual responses based on retrieved documentation
    - Presentation of code examples with explanatory text
    - Suggestions for related documentation
-   - Automatic detection of ChromaDB availability
+   - Automatic detection of Supabase availability
 
 The system includes scripts for:
 - Importing documentation from GitHub with code-aware processing
-- Running a ChromaDB server for vector storage
-- Importing processed documents into ChromaDB
+- Importing processed documents into Supabase
+- Verifying the Supabase setup
 - Testing the RAG system with various queries
+- Legacy scripts for ChromaDB (maintained for backward compatibility)
 
 Future enhancements to the RAG system could include:
-- Adding support for more advanced retrieval techniques like re-ranking
+- Enhancing the re-ranking system with more sophisticated algorithms
 - Implementing code generation capabilities based on documentation context
 - Enhancing the AI assistant with more domain-specific knowledge
 - Adding user feedback mechanisms to improve retrieval quality
@@ -222,3 +234,27 @@ The TradingView Lightweight Charts implementation enhances the chart visualizati
 8. **Performance Optimization**: Efficient rendering for smooth performance
 
 This implementation provides a professional-grade charting solution that allows users to visualize their indicators directly in the application, making it easier to understand and refine their trading strategies.
+
+## Supabase Migration
+The project has been migrated from ChromaDB to Supabase for vector storage, providing several benefits:
+
+1. **Simplified Infrastructure**: No need to run a separate ChromaDB server
+2. **Improved Reliability**: PostgreSQL is a battle-tested database technology
+3. **Scalability**: Supabase can scale to handle larger document collections
+4. **Additional Features**: Supabase provides authentication, storage, and realtime subscriptions
+
+The migration involved:
+- Creating a Supabase client utility
+- Implementing a Supabase RAG system
+- Updating API routes to use Supabase
+- Creating scripts for importing documents to Supabase
+- Adding a verification script for Supabase setup
+- Maintaining backward compatibility with ChromaDB
+
+The Supabase implementation uses the pgvector extension for PostgreSQL, which provides efficient vector similarity search capabilities. The implementation includes:
+- A documentation table for storing content, embeddings, and metadata
+- A match_documents function for similarity search
+- Batched document processing for efficient imports
+- Error handling and fallback mechanisms
+
+For detailed setup instructions, see the SUPABASE_SETUP.md file.

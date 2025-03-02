@@ -1,17 +1,25 @@
 #!/usr/bin/env node
 
 /**
- * Run ChromaDB Server Script
+ * Run ChromaDB Client Script
  * 
- * This script starts a ChromaDB server and optionally imports documents.
+ * This script initializes a ChromaDB client using the JavaScript SDK
+ * and optionally imports documents.
  * 
  * Usage:
  *   node scripts/run-chroma.js [--import]
  */
 
-const { spawn } = require('child_process');
+// Load environment variables from .env file
+require('dotenv').config();
+
 const path = require('path');
 const fs = require('fs');
+const { spawn } = require('child_process');
+
+// Import ChromaDB client
+const { ChromaClient } = require('chromadb');
+const { OpenAIEmbeddingFunction } = require('chromadb');
 
 // Configuration
 const CHROMA_DIR = path.join(__dirname, '..', 'chroma-db');
@@ -27,75 +35,81 @@ if (!fs.existsSync(CHROMA_DIR)) {
   console.log(`Created ChromaDB directory: ${CHROMA_DIR}`);
 }
 
-// Start ChromaDB server
-console.log('Starting ChromaDB server...');
+// Initialize ChromaDB client
+console.log('Initializing ChromaDB client in memory mode...');
+let client;
 
-// Use npx to run chroma
-const chromaProcess = spawn('npx', ['chromadb', 'start', '--path', CHROMA_DIR], {
-  stdio: 'inherit',
-  shell: true
-});
-
-// Handle ChromaDB server process
-chromaProcess.on('error', (error) => {
-  console.error('Failed to start ChromaDB server:', error);
+try {
+  client = new ChromaClient({ path: "memory" });
+  console.log('ChromaDB client initialized in memory mode');
+  console.log('Note: For production use, consider running a persistent ChromaDB server with Python:');
+  console.log('  pip install chromadb');
+  console.log('  python -m chromadb.server');
+  console.log('Then set CHROMA_SERVER_URL=http://localhost:8000 in your .env file');
+} catch (error) {
+  console.error('Error initializing ChromaDB client:', error);
+  console.error('Make sure you have installed the required packages:');
+  console.error('npm install chromadb chromadb-default-embed');
   process.exit(1);
-});
-
-// Handle ChromaDB server exit
-chromaProcess.on('exit', (code, signal) => {
-  if (code) {
-    console.log(`ChromaDB server exited with code ${code}`);
-  } else if (signal) {
-    console.log(`ChromaDB server was killed with signal ${signal}`);
-  } else {
-    console.log('ChromaDB server exited');
-  }
-});
-
-// Handle process termination
-process.on('SIGINT', () => {
-  console.log('Stopping ChromaDB server...');
-  chromaProcess.kill('SIGINT');
-  process.exit(0);
-});
-
-process.on('SIGTERM', () => {
-  console.log('Stopping ChromaDB server...');
-  chromaProcess.kill('SIGTERM');
-  process.exit(0);
-});
+}
 
 // Import documents if flag is provided
 if (shouldImport) {
-  // Wait for ChromaDB server to start
-  setTimeout(() => {
-    console.log('Importing documents to ChromaDB...');
-    
-    // Check if processed documents exist
-    if (!fs.existsSync(PROCESSED_DOCS_PATH)) {
-      console.error(`Processed documents not found at ${PROCESSED_DOCS_PATH}. Run the import-docs.js script first.`);
-      return;
+  console.log('Importing documents to ChromaDB...');
+  
+  // Check if processed documents exist
+  if (!fs.existsSync(PROCESSED_DOCS_PATH)) {
+    console.error(`Processed documents not found at ${PROCESSED_DOCS_PATH}. Run the import-docs.js script first.`);
+    process.exit(1);
+  }
+  
+  // Run the import script
+  const importProcess = spawn('node', ['scripts/import-chroma.js'], {
+    stdio: 'inherit',
+    shell: true
+  });
+  
+  importProcess.on('error', (error) => {
+    console.error('Failed to run import script:', error);
+    process.exit(1);
+  });
+  
+  importProcess.on('exit', (code) => {
+    if (code === 0) {
+      console.log('Import completed successfully');
+    } else {
+      console.error(`Import failed with code ${code}`);
+      process.exit(code);
     }
-    
-    // Run the import script
-    const importProcess = spawn('node', ['scripts/import-chroma.js'], {
-      stdio: 'inherit',
-      shell: true
-    });
-    
-    importProcess.on('error', (error) => {
-      console.error('Failed to run import script:', error);
-    });
-    
-    importProcess.on('exit', (code) => {
-      if (code === 0) {
-        console.log('Import completed successfully');
-      } else {
-        console.error(`Import failed with code ${code}`);
-      }
-    });
-  }, 5000); // Wait 5 seconds for ChromaDB server to start
+  });
+} else {
+  console.log('ChromaDB client is ready. Use --import flag to import documents.');
 }
 
-console.log('ChromaDB server is running. Press Ctrl+C to stop.');
+// Keep the script running to simulate a server
+if (!shouldImport) {
+  console.log('Press Ctrl+C to stop the ChromaDB client.');
+  
+  // List collections every 5 seconds to show the server is running
+  const interval = setInterval(async () => {
+    try {
+      const collections = await client.listCollections();
+      console.log(`[${new Date().toLocaleTimeString()}] Server running. Collections: ${collections.length}`);
+    } catch (error) {
+      console.error('Error listing collections:', error);
+    }
+  }, 5000);
+  
+  // Handle process termination
+  process.on('SIGINT', () => {
+    clearInterval(interval);
+    console.log('Stopping ChromaDB client...');
+    process.exit(0);
+  });
+  
+  process.on('SIGTERM', () => {
+    clearInterval(interval);
+    console.log('Stopping ChromaDB client...');
+    process.exit(0);
+  });
+}

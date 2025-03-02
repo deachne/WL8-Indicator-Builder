@@ -38,10 +38,10 @@ export function AiAssistant({ initialContext, placeholder = "Ask about WL8..." }
 
   // State for RAG system info
   const [ragInfo, setRagInfo] = useState<{
-    usingChroma: boolean;
+    usingSupabase: boolean;
     documentCount: number;
   }>({
-    usingChroma: false,
+    usingSupabase: false,
     documentCount: 0,
   });
 
@@ -54,13 +54,13 @@ export function AiAssistant({ initialContext, placeholder = "Ask about WL8..." }
         if (response.ok) {
           const data = await response.json();
           setRagInfo({
-            usingChroma: data.usingChroma || false,
+            usingSupabase: data.usingSupabase || false,
             documentCount: data.documentCount || 0,
           });
           
           // Set welcome message based on RAG system info
-          const welcomeMessage = data.usingChroma
-            ? `Hello! I'm your WL8 assistant powered by ChromaDB with ${data.documentCount} documents. I can help you with questions about Wealth-Lab 8 indicators, strategies, and API usage. How can I help you today?`
+          const welcomeMessage = data.usingSupabase
+            ? `Hello! I'm your WL8 assistant powered by Supabase with ${data.documentCount} documents. I can help you with questions about Wealth-Lab 8 indicators, strategies, and API usage. How can I help you today?`
             : "Hello! I'm your WL8 assistant. I can help you with questions about Wealth-Lab 8 indicators, strategies, and API usage. How can I help you today?";
           
           setMessages([

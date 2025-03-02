@@ -1,0 +1,239 @@
+Langchain ChromaDB Tutorial
+Learn how to effectively use ChromaDB with Langchain in this comprehensive tutorial.
+
+Installation and Setup of LangChain with Chroma
+To effectively utilize LangChain with Chroma, you need to follow a structured installation process that ensures all necessary components are in place. This guide will walk you through the steps required to set up LangChain and integrate it with ChromaDB, a powerful database for managing embeddings.
+
+Installing LangChain
+Begin by installing the main LangChain package. You can choose between two popular package managers: Pip or Conda. Here are the commands you need to run:
+
+Using Pip
+pip install langchain
+Using Conda
+conda install langchain -c conda-forge
+These commands will install the core LangChain package, which serves as a foundation for your projects. However, to leverage the full potential of LangChain, especially when working with Chroma, you will need to install additional dependencies.
+
+Integrating with ChromaDB
+Once you have LangChain installed, the next step is to integrate it with ChromaDB. This integration allows you to store and retrieve embeddings efficiently. To install the Chroma integration, run the following command:
+
+pip install chromadb
+This command will add the necessary components to your LangChain setup, enabling seamless interaction with ChromaDB.
+
+Verifying the Installation
+After installation, it’s crucial to verify that everything is set up correctly. You can do this by running a simple test script:
+
+from langchain import Chroma
+
+# Initialize Chroma client
+client = Chroma()
+
+# Check connection
+print(client.is_connected())
+If the output returns True, your installation is successful, and you are ready to start building applications using LangChain and Chroma.
+
+Conclusion
+With LangChain and ChromaDB installed, you can now explore the various functionalities offered by LangChain, including data retrieval, processing, and embedding management. This setup is essential for anyone looking to build advanced applications that require efficient data handling and retrieval capabilities.
+
+Related Documentation
+Langchain ChromaDB API Overview
+Explore the Langchain ChromaDB API for efficient data management and retrieval in your applications.
+
+Langchain ChromaDB Add Documents
+Learn how to efficiently add documents to ChromaDB using Langchain for enhanced data management and retrieval.
+
+LangChain ChromaDB insights - November 2024
+Explore the integration and capabilities of LangChain ChromaDB, enhancing data management and analysis.
+
+Langchain ChromaDB PDF Integration
+Explore how Langchain integrates with ChromaDB for efficient PDF handling and data management.
+
+Was this helpful?
+
+
+Yes
+
+No
+
+Suggest edits
+
+Build
+
+Replay
+
+Functions
+Developer UI
+Simulate, time-travel and replay AI agents
+
+Restack offers a full developer toolkit, including a UI to visualize and replay workflows. Code on one side, see your workflows on the other speeding up debugging and local development.
+
+
+Learn more ->
+Build Illustration
+Using Chroma as a VectorStore
+Chroma serves as a powerful vector database designed for building AI applications with embeddings. To get started with Chroma, you first need to install the necessary package. This can be done easily using pip:
+
+pip install langchain-chroma
+Once installed, you can utilize Chroma as a vector store, which is essential for tasks such as semantic search and example selection. The following code snippet demonstrates how to import the Chroma wrapper:
+
+from langchain_chroma import Chroma
+Creating a Vector Store
+To effectively use Chroma, you need to create vectors that will be stored in the database. This is typically achieved through embeddings. Familiarizing yourself with the text embedding model interfaces is highly recommended before diving deeper into the functionalities of Chroma.
+
+Example Usage
+Here’s a simple example of how to set up a Chroma vector store:
+
+from langchain_chroma import Chroma
+
+# Initialize Chroma vector store
+vector_store = Chroma()
+This initializes a new instance of the Chroma vector store, ready for you to add your vectors.
+
+Retrieving Data
+Chroma also provides a retriever functionality, which allows you to query the stored vectors efficiently. You can implement this by importing the SelfQueryRetriever as shown below:
+
+from langchain.retrievers import SelfQueryRetriever
+This retriever can be used to perform self-querying on the vectors stored in Chroma, enabling you to retrieve relevant information based on your queries.
+
+Conclusion
+Chroma is a versatile tool that integrates seamlessly with Langchain, making it an excellent choice for developers looking to implement vector stores in their AI applications. For more detailed examples and advanced usage, refer to the official documentation at Chroma Documentation.
+
+Related Documentation
+Langchain ChromaDB Documentation
+Explore the Langchain ChromaDB documentation for in-depth technical insights and usage guidelines.
+
+Langchain ChromaDB GitHub Overview
+Explore Langchain's ChromaDB on GitHub, a powerful tool for managing and querying vector databases efficiently.
+
+Langchain ChromaDB PDF Integration
+Explore how Langchain integrates with ChromaDB for efficient PDF handling and data management.
+
+Langchain ChromaDB Filter Overview
+Explore how to effectively use filters in Langchain's ChromaDB for optimized data retrieval and management.
+
+Was this helpful?
+
+
+Yes
+
+No
+
+Suggest edits
+Implementing Self-Query Retrieval with Chroma
+Overview
+Chroma serves as a powerful database designed for building AI applications that utilize embeddings. This section delves into the implementation of self-query retrieval using Chroma, specifically within the Langchain framework. By leveraging Chroma's capabilities, developers can enhance their applications' retrieval efficiency and accuracy.
+
+Installation and Setup
+To get started with Chroma, you need to install the langchain-chroma package. This can be done easily using pip:
+
+pip install langchain-chroma
+Once installed, you can import Chroma into your project as follows:
+
+from langchain_chroma import Chroma
+This import allows you to utilize Chroma as a vector store, which is essential for semantic search and example selection.
+
+Using Chroma as a VectorStore
+Chroma provides a wrapper around its vector databases, enabling seamless integration with Langchain. This wrapper allows you to perform various operations, including:
+
+Semantic Search: Retrieve relevant documents based on the meaning of the query rather than just keyword matching.
+Example Selection: Choose examples that best represent the data for training or evaluation purposes.
+For a comprehensive guide on using the Chroma wrapper, refer to the official documentation here.
+
+Implementing Self-Query Retrieval
+To implement self-query retrieval, you will utilize the SelfQueryRetriever class from Langchain. This class is designed to facilitate the retrieval of information based on user queries. Here’s how to set it up:
+
+from langchain.retrievers import SelfQueryRetriever
+Example Usage
+Here’s a basic example of how to use the SelfQueryRetriever with Chroma:
+
+# Initialize Chroma as a vector store
+chroma_store = Chroma()
+
+# Create a SelfQueryRetriever instance
+retriever = SelfQueryRetriever(vectorstore=chroma_store)
+
+# Perform a retrieval query
+results = retriever.retrieve("What are the benefits of using Chroma?")
+This code snippet demonstrates how to initialize the Chroma vector store and create a self-query retriever. The retrieve method allows you to input a query and receive relevant results based on the embeddings stored in Chroma.
+
+Conclusion
+By implementing self-query retrieval with Chroma, you can significantly enhance the performance of your AI applications. This approach not only improves the accuracy of the results but also streamlines the retrieval process, making it more efficient. For further exploration, consider checking out the broader tutorial on RAG or learn how to create your own custom retriever over any data source.
+
+Related Documentation
+Langchain ChromaDB PDF Integration
+Explore how Langchain integrates with ChromaDB for efficient PDF handling and data management.
+
+Langchain ChromaDB JS Overview
+Explore Langchain's ChromaDB JS for efficient data management and retrieval in your applications.
+
+Langchain ChromaDB Add Documents
+Learn how to efficiently add documents to ChromaDB using Langchain for enhanced data management and retrieval.
+
+Langchain ChromaDB API Overview
+Explore the Langchain ChromaDB API for efficient data management and retrieval in your applications.
+
+Was this helpful?
+
+
+Yes
+
+No
+
+Suggest edits
+
+Build
+
+Replay
+
+Functions
+Developer UI
+Simulate, time-travel and replay AI agents
+
+Restack offers a full developer toolkit, including a UI to visualize and replay workflows. Code on one side, see your workflows on the other speeding up debugging and local development.
+
+
+Learn more ->
+Build Illustration
+Enhancing Langchain with Chroma for RetrievalQA
+Chroma serves as a powerful database designed for building AI applications that utilize embeddings. It provides a seamless integration with Langchain, particularly for retrieval-based tasks. Below, we delve into the installation, setup, and usage of Chroma within the Langchain framework.
+
+Installation and Setup
+To get started with Chroma, you need to install the Langchain Chroma package. This can be done easily using pip:
+
+pip install langchain-chroma
+VectorStore
+Chroma offers a wrapper around its vector databases, enabling you to utilize it as a vector store. This is particularly useful for semantic search and example selection. Here’s how you can import and use the Chroma vector store:
+
+from langchain_chroma import Chroma
+For a comprehensive guide on using the Chroma wrapper, refer to the official documentation here.
+
+Retriever
+To effectively retrieve information, you can implement a retriever that works with Chroma. This allows you to fetch relevant data based on your queries. Here’s an example of how to set up a self-query retriever:
+
+from langchain.retrievers import SelfQueryRetriever
+For practical usage examples, you can check the documentation here.
+
+Retrieval Chain
+When addressing complex queries, such as how Langsmith can assist with testing, retrieval becomes essential. It allows you to manage large datasets by fetching only the most pertinent information to pass to the LLM. This is achieved through a retriever that can be backed by various data sources, including vector stores.
+
+To index the data you wish to retrieve, you can utilize the WebBaseLoader. First, ensure you have BeautifulSoup installed:
+
+pip install beautifulsoup4
+Then, you can import and use the WebBaseLoader as follows:
+
+from langchain_community.document_loaders import WebBaseLoader
+loader = WebBaseLoader("https://docs.smith.langchain.com/user_guide")
+
+docs = loader.load()
+This setup allows you to efficiently manage and retrieve data, enhancing the capabilities of your Langchain applications with Chroma's robust features.
+
+Related Documentation
+Langchain ChromaDB Retriever Overview
+Explore the Langchain ChromaDB retriever, its features, and how it enhances data retrieval in AI applications.
+
+Langchain ChromaDB JS Overview
+Explore Langchain's ChromaDB JS for efficient data management and retrieval in your applications.
+
+Langchain Chroma DB Indexing
+Explore Langchain's Chroma DB indexing techniques for efficient data retrieval and management in your applications.
+
+Langchain Hybrid Search Chroma
