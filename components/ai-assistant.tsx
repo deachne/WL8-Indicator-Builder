@@ -139,58 +139,105 @@ export function AiAssistant({ initialContext, placeholder = "Ask about WL8..." }
         <CardTitle className="text-lg">WL8 AI Assistant</CardTitle>
       </CardHeader>
       
-      <Tabs defaultValue="chat" className="flex-1 flex flex-col">
+      <Tabs defaultValue="chat" className="flex-1 flex flex-col h-full">
         <TabsList className="mx-4 mt-2">
           <TabsTrigger value="chat">Chat</TabsTrigger>
           <TabsTrigger value="docs">Related Docs</TabsTrigger>
         </TabsList>
         
-        <TabsContent value="chat" className="flex-1 flex flex-col p-0 m-0">
-          <ScrollArea className="flex-1 p-4">
-            <div className="space-y-4">
-              {messages.map((message, i) => (
-                <div
-                  key={i}
-                  className={`flex ${
-                    message.role === "user" ? "justify-end" : "justify-start"
-                  }`}
-                >
+        <TabsContent value="chat" className="flex-1 flex flex-col p-0 m-0 h-full">
+          {/* Main container with flex to push chat input to bottom */}
+          <div className="flex flex-col h-full relative">
+            {/* Chat messages area - takes up all available space */}
+            <ScrollArea className="flex-grow p-4 pb-20">
+              <div className="space-y-4">
+                {messages.map((message, i) => (
                   <div
-                    className={`max-w-[80%] rounded-lg p-3 ${
-                      message.role === "user"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted"
+                    key={i}
+                    className={`flex ${
+                      message.role === "user" ? "justify-end" : "justify-start"
                     }`}
                   >
-                    <MarkdownContent content={message.content} />
+                    <div
+                      className={`max-w-[80%] rounded-lg p-3 ${
+                        message.role === "user"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted"
+                      }`}
+                    >
+                      <MarkdownContent content={message.content} />
+                    </div>
                   </div>
-                </div>
-              ))}
-              {isLoading && (
-                <div className="flex justify-start">
-                  <div className="max-w-[80%] rounded-lg p-3 bg-muted">
-                    <Loader2 className="h-5 w-5 animate-spin" />
+                ))}
+                {isLoading && (
+                  <div className="flex justify-start">
+                    <div className="max-w-[80%] rounded-lg p-3 bg-muted">
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    </div>
                   </div>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+            </ScrollArea>
+            
+            {/* Input area - fixed at the bottom */}
+            <div className="p-4 border-t bg-gray-900 absolute bottom-0 left-0 right-0 z-10">
+              <form onSubmit={handleSubmit} className="w-full">
+                <div className="flex gap-2 mb-2">
+                  <textarea
+                    placeholder={placeholder}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    disabled={isLoading}
+                    className="flex-1 min-h-[60px] p-2 rounded-md border border-gray-600 bg-gray-800 text-white resize-none"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSubmit(e);
+                      }
+                    }}
+                  />
+                  <Button 
+                    type="submit" 
+                    size="icon" 
+                    disabled={isLoading} 
+                    className="bg-blue-600 hover:bg-blue-700 self-end h-10 w-10"
+                    title="Send message"
+                  >
+                    {isLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4" />
+                    )}
+                  </Button>
                 </div>
-              )}
-              <div ref={messagesEndRef} />
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      type="button" 
+                      variant="default" 
+                      size="sm" 
+                      className="text-xs h-7 px-2 flex items-center bg-gray-700 hover:bg-gray-600"
+                      title="Attach an image to your message"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3 mr-1">
+                        <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                        <circle cx="9" cy="9" r="2" />
+                        <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                      </svg>
+                      Attach Image
+                    </Button>
+                  </div>
+                  {isLoading && (
+                    <div className="text-xs text-gray-400 flex items-center">
+                      <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                      Processing...
+                    </div>
+                  )}
+                </div>
+              </form>
             </div>
-          </ScrollArea>
-          
-          <CardFooter className="p-4 pt-2 border-t">
-            <form onSubmit={handleSubmit} className="w-full flex gap-2">
-              <Input
-                placeholder={placeholder}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                disabled={isLoading}
-                className="flex-1"
-              />
-              <Button type="submit" size="icon" disabled={isLoading}>
-                <Send className="h-4 w-4" />
-              </Button>
-            </form>
-          </CardFooter>
+          </div>
         </TabsContent>
         
         <TabsContent value="docs" className="flex-1 flex flex-col p-0 m-0">
