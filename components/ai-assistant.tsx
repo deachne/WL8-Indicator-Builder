@@ -36,14 +36,61 @@ export function AiAssistant({ initialContext, placeholder = "Ask about WL8..." }
   const [suggestions, setSuggestions] = useState<Source[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Add system welcome message on first load
+  // State for RAG system info
+  const [ragInfo, setRagInfo] = useState<{
+    usingChroma: boolean;
+    documentCount: number;
+  }>({
+    usingChroma: false,
+    documentCount: 0,
+  });
+
+  // Add system welcome message on first load and check RAG system
   useEffect(() => {
-    setMessages([
-      {
-        role: "assistant",
-        content: "Hello! I'm your WL8 assistant. I can help you with questions about Wealth-Lab 8 indicators, strategies, and API usage. How can I help you today?",
-      },
-    ]);
+    // Check RAG system info
+    const checkRagSystem = async () => {
+      try {
+        const response = await fetch("/api/init-rag");
+        if (response.ok) {
+          const data = await response.json();
+          setRagInfo({
+            usingChroma: data.usingChroma || false,
+            documentCount: data.documentCount || 0,
+          });
+          
+          // Set welcome message based on RAG system info
+          const welcomeMessage = data.usingChroma
+            ? `Hello! I'm your WL8 assistant powered by ChromaDB with ${data.documentCount} documents. I can help you with questions about Wealth-Lab 8 indicators, strategies, and API usage. How can I help you today?`
+            : "Hello! I'm your WL8 assistant. I can help you with questions about Wealth-Lab 8 indicators, strategies, and API usage. How can I help you today?";
+          
+          setMessages([
+            {
+              role: "assistant",
+              content: welcomeMessage,
+            },
+          ]);
+        } else {
+          // Fallback welcome message
+          setMessages([
+            {
+              role: "assistant",
+              content: "Hello! I'm your WL8 assistant. I can help you with questions about Wealth-Lab 8 indicators, strategies, and API usage. How can I help you today?",
+            },
+          ]);
+        }
+      } catch (error) {
+        console.error("Error checking RAG system:", error);
+        // Fallback welcome message
+        setMessages([
+          {
+            role: "assistant",
+            content: "Hello! I'm your WL8 assistant. I can help you with questions about Wealth-Lab 8 indicators, strategies, and API usage. How can I help you today?",
+          },
+        ]);
+      }
+    };
+    
+    checkRagSystem();
     
     // If there's initial context, get suggestions based on it
     if (initialContext) {
@@ -149,7 +196,7 @@ export function AiAssistant({ initialContext, placeholder = "Ask about WL8..." }
           {/* Main container with flex to push chat input to bottom */}
           <div className="flex flex-col h-full relative">
             {/* Chat messages area - takes up all available space */}
-            <ScrollArea className="flex-grow p-4 pb-20">
+            <ScrollArea className="flex-grow p-4 pb-20 h-full">
               <div className="space-y-4">
                 {messages.map((message, i) => (
                   <div
@@ -181,7 +228,7 @@ export function AiAssistant({ initialContext, placeholder = "Ask about WL8..." }
             </ScrollArea>
             
             {/* Input area - fixed at the bottom */}
-            <div className="p-4 border-t bg-gray-900 absolute bottom-0 left-0 right-0 z-10">
+            <div className="p-4 border-t bg-gray-900 absolute bottom-0 left-0 right-0 w-full z-10 mt-auto">
               <form onSubmit={handleSubmit} className="w-full">
                 <div className="flex gap-2 mb-2">
                   <textarea

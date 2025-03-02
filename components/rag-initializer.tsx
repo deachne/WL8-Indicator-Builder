@@ -2,9 +2,19 @@
 
 import { useEffect, useState } from "react";
 
+interface RagStatus {
+  status: "loading" | "success" | "error";
+  message: string;
+  documentCount?: number;
+  usingChroma?: boolean;
+  collectionName?: string;
+}
+
 export function RagInitializer() {
-  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
-  const [message, setMessage] = useState("");
+  const [ragStatus, setRagStatus] = useState<RagStatus>({
+    status: "loading",
+    message: "Initializing RAG system...",
+  });
 
   useEffect(() => {
     const initializeRag = async () => {
@@ -13,15 +23,32 @@ export function RagInitializer() {
         const data = await response.json();
         
         if (response.ok) {
-          setStatus("success");
-          setMessage(data.message);
+          setRagStatus({
+            status: "success",
+            message: data.message,
+            documentCount: data.documentCount,
+            usingChroma: data.usingChroma,
+            collectionName: data.collectionName,
+          });
+          
+          // Log RAG system information to console
+          console.log("RAG System Initialized:", {
+            message: data.message,
+            documentCount: data.documentCount,
+            usingChroma: data.usingChroma,
+            collectionName: data.collectionName,
+          });
         } else {
-          setStatus("error");
-          setMessage(data.error || "Failed to initialize RAG system");
+          setRagStatus({
+            status: "error",
+            message: data.error || "Failed to initialize RAG system",
+          });
         }
       } catch (error) {
-        setStatus("error");
-        setMessage("An unexpected error occurred while initializing the RAG system");
+        setRagStatus({
+          status: "error",
+          message: "An unexpected error occurred while initializing the RAG system",
+        });
         console.error("Error initializing RAG system:", error);
       }
     };

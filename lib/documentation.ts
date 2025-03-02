@@ -1,3 +1,6 @@
+import fs from 'fs';
+import path from 'path';
+
 // Types for documentation data
 export interface DocCategory {
   id: string;
@@ -15,9 +18,33 @@ export interface DocItem {
   tags?: string[];
 }
 
-// Mock data for initial development
-// This will be replaced with actual data from the database in the future
-export const mockDocCategories: DocCategory[] = [
+// Path to the documentation index
+const DOCS_INDEX_PATH = path.join(process.cwd(), 'docs', 'index.json');
+
+// Check if imported documentation exists
+function hasImportedDocs(): boolean {
+  try {
+    return fs.existsSync(DOCS_INDEX_PATH);
+  } catch (error) {
+    console.error('Error checking for imported docs:', error);
+    return false;
+  }
+}
+
+// Load documentation from imported files
+function loadImportedDocs(): DocCategory[] {
+  try {
+    const indexContent = fs.readFileSync(DOCS_INDEX_PATH, 'utf8');
+    const index = JSON.parse(indexContent);
+    return index.categories;
+  } catch (error) {
+    console.error('Error loading imported docs:', error);
+    return [];
+  }
+}
+
+// Mock data for initial development or fallback
+const mockDocCategories: DocCategory[] = [
   {
     id: 'api-reference',
     title: 'API Reference',
@@ -226,19 +253,33 @@ public class MySMA : Indicator
   },
 ];
 
-// Function to get all documentation categories
+// Get the documentation categories (imported or mock)
 export function getDocCategories(): DocCategory[] {
+  // Check if imported documentation exists
+  if (hasImportedDocs()) {
+    const importedDocs = loadImportedDocs();
+    if (importedDocs.length > 0) {
+      console.log(`Using ${importedDocs.length} imported documentation categories`);
+      return importedDocs;
+    }
+  }
+  
+  // Fall back to mock data
+  console.log('Using mock documentation data');
   return mockDocCategories;
 }
 
 // Function to get a specific documentation item by ID
 export function getDocItem(id: string): DocItem | undefined {
-  for (const category of mockDocCategories) {
+  const categories = getDocCategories();
+  
+  for (const category of categories) {
     const item = category.items.find(item => item.id === id);
     if (item) {
       return item;
     }
   }
+  
   return undefined;
 }
 
@@ -250,8 +291,9 @@ export function searchDocs(query: string): DocItem[] {
   
   const lowerQuery = query.toLowerCase();
   const results: DocItem[] = [];
+  const categories = getDocCategories();
   
-  for (const category of mockDocCategories) {
+  for (const category of categories) {
     for (const item of category.items) {
       if (
         item.title.toLowerCase().includes(lowerQuery) ||
@@ -269,7 +311,9 @@ export function searchDocs(query: string): DocItem[] {
 
 // Function to get navigation items for the sidebar
 export function getDocNavItems(): { title: string; href: string; items?: { title: string; href: string }[] }[] {
-  return mockDocCategories.map(category => ({
+  const categories = getDocCategories();
+  
+  return categories.map(category => ({
     title: category.title,
     href: `/documentation/${category.id}`,
     items: category.items.map(item => ({
