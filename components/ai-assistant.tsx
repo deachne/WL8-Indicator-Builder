@@ -7,7 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Send, BookOpen } from "lucide-react";
+import { Loader2, Send, BookOpen, Code, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { MarkdownContent } from "@/components/markdown-content";
 
@@ -26,9 +26,14 @@ interface Source {
 interface AiAssistantProps {
   initialContext?: string;
   placeholder?: string;
+  onApplyCode?: (code: string) => void;
 }
 
-export function AiAssistant({ initialContext, placeholder = "Ask about WL8..." }: AiAssistantProps) {
+export function AiAssistant({ 
+  initialContext, 
+  placeholder = "Ask about WL8...",
+  onApplyCode 
+}: AiAssistantProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -98,9 +103,35 @@ export function AiAssistant({ initialContext, placeholder = "Ask about WL8..." }
     }
   }, [initialContext]);
 
+  // Extract code blocks from a markdown string
+  const extractCodeBlocks = (markdown: string): { language: string; code: string }[] => {
+    const codeBlockRegex = /```(\w*)\n([\s\S]*?)```/g;
+    const codeBlocks: { language: string; code: string }[] = [];
+    
+    let match;
+    while ((match = codeBlockRegex.exec(markdown)) !== null) {
+      const [_, language, code] = match;
+      codeBlocks.push({
+        language: language || "csharp",
+        code: code.trim()
+      });
+    }
+    
+    return codeBlocks;
+  };
+
+  // Apply code to the editor
+  const handleApplyCode = (code: string) => {
+    if (onApplyCode) {
+      onApplyCode(code);
+    }
+  };
+
   // Scroll to bottom of messages when new messages are added
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
 
   // Handle form submission
@@ -193,42 +224,71 @@ export function AiAssistant({ initialContext, placeholder = "Ask about WL8..." }
         </TabsList>
         
         <TabsContent value="chat" className="flex-1 flex flex-col p-0 m-0 h-full">
-          {/* Main container with flex to push chat input to bottom */}
-          <div className="flex flex-col h-full relative">
-            {/* Chat messages area - takes up all available space */}
-            <ScrollArea className="flex-grow p-4 pb-20 h-full">
-              <div className="space-y-4">
-                {messages.map((message, i) => (
-                  <div
-                    key={i}
-                    className={`flex ${
-                      message.role === "user" ? "justify-end" : "justify-start"
-                    }`}
-                  >
-                    <div
-                      className={`max-w-[80%] rounded-lg p-3 ${
-                        message.role === "user"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted"
-                      }`}
-                    >
-                      <MarkdownContent content={message.content} />
+          {/* Main container with flex layout */}
+          <div className="flex flex-col h-full">
+            {/* Chat messages area with flex-grow and scrolling */}
+            <div className="flex-grow overflow-hidden">
+              <ScrollArea className="h-full p-4">
+                <div className="space-y-4 pb-4">
+                  {messages.map((message, i) => {
+                    // Extract code blocks for assistant messages
+                    const codeBlocks = message.role === "assistant" 
+                      ? extractCodeBlocks(message.content) 
+                      : [];
+                    
+                    return (
+                      <div
+                        key={i}
+                        className={`flex ${
+                          message.role === "user" ? "justify-end" : "justify-start"
+                        }`}
+                      >
+                        <div
+                          className={`max-w-[85%] rounded-lg p-3 ${
+                            message.role === "user"
+                              ? "bg-blue-600 text-white"
+                              : "bg-muted"
+                          }`}
+                        >
+                          <MarkdownContent content={message.content} />
+                          
+                          {/* Add "Apply to Editor" buttons for code blocks */}
+                          {message.role === "assistant" && codeBlocks.length > 0 && (
+                            <div className="mt-2 pt-2 border-t border-gray-700">
+                              {codeBlocks.map((block, blockIndex) => (
+                                <Button
+                                  key={blockIndex}
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleApplyCode(block.code)}
+                                  className="mt-1 text-xs bg-blue-900 hover:bg-blue-800 border-blue-700"
+                                  disabled={!onApplyCode}
+                                >
+                                  <Code className="h-3 w-3 mr-1" />
+                                  Apply {block.language === "csharp" ? "C#" : block.language} Code to Editor
+                                  <ArrowRight className="h-3 w-3 ml-1" />
+                                </Button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {isLoading && (
+                    <div className="flex justify-start">
+                      <div className="max-w-[85%] rounded-lg p-3 bg-muted">
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      </div>
                     </div>
-                  </div>
-                ))}
-                {isLoading && (
-                  <div className="flex justify-start">
-                    <div className="max-w-[80%] rounded-lg p-3 bg-muted">
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    </div>
-                  </div>
-                )}
-                <div ref={messagesEndRef} />
-              </div>
-            </ScrollArea>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
+              </ScrollArea>
+            </div>
             
             {/* Input area - fixed at the bottom */}
-            <div className="p-4 border-t bg-gray-900 absolute bottom-0 left-0 right-0 w-full z-10 mt-auto">
+            <div className="p-4 border-t bg-gray-900 sticky bottom-0">
               <form onSubmit={handleSubmit} className="w-full">
                 <div className="flex gap-2 mb-2">
                   <textarea

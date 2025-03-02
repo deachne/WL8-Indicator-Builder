@@ -124,18 +124,50 @@ wl8-indicator-builder/
 - Responsive layout with optimized UI components
 - Scripts for importing documentation and managing vector storage
 
+## AI Assistant Improvements
+The AI Assistant component has been significantly enhanced with the following improvements:
+
+1. **Enhanced User Interface**:
+   - Improved scrolling mechanism for better message navigation
+   - Enhanced message contrast with blue background and white text for user messages
+   - Fixed positioning of the input area at the bottom of the chat interface
+   - Responsive layout that adapts to different screen sizes
+
+2. **Code Editor Integration**:
+   - Added code block extraction from AI responses
+   - Implemented "Apply to Editor" buttons for code blocks
+   - Connected the AI Assistant to the code editor in the Builder page
+   - Added logic to detect C# code and apply it to the appropriate editor tab
+
+3. **Specialized AI Prompt**:
+   - Positioned the AI as an expert in WL8 indicator development
+   - Enhanced responses for indicator building requests
+   - Included best practices for indicator development
+   - Added instructions for using the "Apply to Editor" button
+   - Provided code templates when no specific examples are available
+
+4. **Consistent Experience Across RAG Systems**:
+   - Standardized responses across all three RAG implementations (standard, enhanced, and Supabase)
+   - Consistent code example formatting and presentation
+   - Unified best practices recommendations
+   - Improved error handling and fallbacks
+
+These improvements create a more seamless experience where users can easily interact with the AI Assistant to build indicators, get help with code, and apply code examples directly to the editor with a single click.
+
 ## Next Steps
 As outlined in the updated PROJECT.md, the next steps for the project are:
 
 ### Indicator Builder Enhancement ✅
 - ✅ Implement Monaco editor for C# code editing
 - ✅ Integrate TradingView charts for visualization
+- ✅ Enhance AI Assistant with code editor integration
 
 ### RAG System Improvements
 - ✅ Replace the mock implementation with ChromaDB for better document vectorization
 - ✅ Implement code-aware document processing
 - ✅ Migrate from ChromaDB to Supabase with pgvector for improved reliability and scalability
 - ✅ Implement hybrid re-ranking for better retrieval quality
+- ✅ Enhance AI Assistant with specialized prompts for indicator building
 - Implement code generation capabilities based on documentation context
 - Implement AI model selection feature to allow choosing between OpenAI and Anthropic models for indicator building and assistance
 
