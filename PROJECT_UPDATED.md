@@ -8,7 +8,7 @@ The WL8 Indicator Builder is a platform for creating, testing, and sharing indic
 - **Styling**: Tailwind CSS
 - **RAG System**: ChromaDB (planned)
 - **Code Editor**: Monaco Editor ✅
-- **Chart Visualization**: TradingView Lightweight Charts (planned)
+- **Chart Visualization**: TradingView Lightweight Charts ✅
 
 ## Repository
 - GitHub: [https://github.com/deachne/WL8-Indicator-Builder](https://github.com/deachne/WL8-Indicator-Builder)
@@ -83,7 +83,12 @@ wl8-indicator-builder/
   - IntelliSense and code completion for C# and WealthLab functions
   - Error diagnostics for basic syntax errors
   - Toggle between read-only and editable modes
-- Chart visualization and template selection
+- Chart visualization with TradingView Lightweight Charts integration, featuring:
+  - Real-time chart updates based on selected indicators
+  - Dark theme to match the UI
+  - Support for multiple technical indicators (SMA, EMA, RSI, MACD, Bollinger Bands)
+  - Responsive design that adapts to container size
+  - Error handling for smooth indicator transitions
 - AI assistant integrated with documentation, builder, and Q&A pages
 - Mock RAG system implemented for document retrieval
 - API endpoints for querying and suggestions
@@ -94,7 +99,7 @@ As outlined in the updated PROJECT.md, the next steps for the project are:
 
 ### Indicator Builder Enhancement
 - ✅ Implement Monaco editor for C# code editing
-- Integrate TradingView charts for visualization
+- ✅ Integrate TradingView charts for visualization
 - Create console output component for debugging
 
 ### RAG System Improvements
@@ -146,3 +151,25 @@ The Monaco Editor implementation enhances the code editing experience with the f
 6. **Editor Controls**: Toggle between read-only and editable modes
 
 This implementation significantly improves the developer experience when creating and editing indicators, making the process more efficient and user-friendly.
+
+## TradingView Lightweight Charts Implementation
+The TradingView Lightweight Charts implementation enhances the chart visualization experience with the following features:
+
+1. **Candlestick Charts**: Professional-grade candlestick charts for price visualization
+2. **Technical Indicators**: Support for multiple technical indicators:
+   - Simple Moving Average (SMA)
+   - Exponential Moving Average (EMA)
+   - Relative Strength Index (RSI)
+   - Moving Average Convergence Divergence (MACD)
+   - Bollinger Bands
+3. **Responsive Design**: Charts automatically resize to fit their container
+4. **Dark Theme**: Styled to match the application's dark theme
+5. **Real-time Updates**: Charts update in real-time when:
+   - Different indicators are selected
+   - Template changes are made
+   - Symbol selection changes
+6. **Error Handling**: Robust error handling for smooth indicator transitions
+7. **Interactive Elements**: Time scale navigation, crosshair for precise readings
+8. **Performance Optimization**: Efficient rendering for smooth performance
+
+This implementation provides a professional-grade charting solution that allows users to visualize their indicators directly in the application, making it easier to understand and refine their trading strategies.
