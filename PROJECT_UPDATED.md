@@ -105,7 +105,8 @@ wl8-indicator-builder/
 
 ## Current Status
 - Homepage with all sections implemented
-- Documentation browser with search functionality
+- Documentation browser with search functionality and improved text visibility
+- Enhanced markdown content rendering with proper contrast for all text elements
 - Indicator builder with enhanced Monaco Editor for C# code editing, featuring:
   - Syntax highlighting and code folding
   - IntelliSense and code completion for C# and WealthLab functions
@@ -136,8 +137,10 @@ The AI Assistant component has been significantly enhanced with the following im
 2. **Code Editor Integration**:
    - Added code block extraction from AI responses
    - Implemented "Apply to Editor" buttons for code blocks
+   - Added "Clear & Apply Code" button for replacing editor content
    - Connected the AI Assistant to the code editor in the Builder page
    - Added logic to detect C# code and apply it to the appropriate editor tab
+   - Implemented direct editor control for clearing and replacing content
 
 3. **Specialized AI Prompt**:
    - Positioned the AI as an expert in WL8 indicator development
@@ -145,14 +148,22 @@ The AI Assistant component has been significantly enhanced with the following im
    - Included best practices for indicator development
    - Added instructions for using the "Apply to Editor" button
    - Provided code templates when no specific examples are available
+   - Added specialized templates for common indicators (SMA, RSI, MACD, Bollinger Bands)
 
-4. **Consistent Experience Across RAG Systems**:
+4. **Improved Intent Detection**:
+   - Added detection for code deletion requests
+   - Implemented pattern matching for specific indicator types
+   - Added parameter extraction from user queries (e.g., periods, thresholds)
+   - Enhanced handling of compound requests (e.g., "delete the code and create an SMA crossover")
+
+5. **Consistent Experience Across RAG Systems**:
    - Standardized responses across all three RAG implementations (standard, enhanced, and Supabase)
    - Consistent code example formatting and presentation
    - Unified best practices recommendations
    - Improved error handling and fallbacks
+   - Added structured action information to RAG responses
 
-These improvements create a more seamless experience where users can easily interact with the AI Assistant to build indicators, get help with code, and apply code examples directly to the editor with a single click.
+These improvements create a more seamless experience where users can easily interact with the AI Assistant to build indicators, get help with code, and apply code examples directly to the editor with a single click. The AI can now understand and execute more complex requests, such as "delete the code and create a simple SMA 10 period crossover," providing a more intuitive and efficient workflow for indicator development.
 
 ## Next Steps
 As outlined in the updated PROJECT.md, the next steps for the project are:
