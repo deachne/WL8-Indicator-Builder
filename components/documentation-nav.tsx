@@ -1,8 +1,8 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import {
   Accordion,
@@ -12,6 +12,8 @@ import {
 } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
+import { Search } from 'lucide-react';
 
 interface DocNavItem {
   title: string;
@@ -26,16 +28,34 @@ interface DocumentationNavProps {
 
 export function DocumentationNav({ items, onSearch }: DocumentationNavProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/documentation/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
   
   return (
     <div className="flex flex-col h-full">
       {/* Search input */}
       <div className="p-4 border-b">
-        <Input 
-          placeholder="Search documentation..." 
-          className="w-full"
-          onChange={(e) => onSearch && onSearch(e.target.value)}
-        />
+        <form onSubmit={handleSearch} className="flex gap-2">
+          <Input 
+            placeholder="Search documentation..." 
+            className="w-full"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              if (onSearch) onSearch(e.target.value);
+            }}
+          />
+          <Button type="submit" size="sm" variant="ghost">
+            <Search className="h-4 w-4" />
+          </Button>
+        </form>
       </div>
       
       {/* Navigation items */}

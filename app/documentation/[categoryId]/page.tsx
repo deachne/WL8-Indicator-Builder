@@ -2,7 +2,7 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { DocumentationLayout } from "@/components/documentation-layout";
 import { DocumentationNav } from "@/components/documentation-nav";
-import { getDocCategories, getDocNavItems } from "@/lib/documentation";
+import { fetchDocCategory, fetchDocNavItems, fetchDocCategories } from "@/lib/documentation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -13,16 +13,15 @@ interface CategoryPageProps {
   };
 }
 
-export default function CategoryPage({ params }: CategoryPageProps) {
+export default async function CategoryPage({ params }: CategoryPageProps) {
   const { categoryId } = params;
-  const categories = getDocCategories();
-  const category = categories.find((cat) => cat.id === categoryId);
+  const category = await fetchDocCategory(categoryId);
   
   if (!category) {
     notFound();
   }
   
-  const navItems = getDocNavItems();
+  const navItems = await fetchDocNavItems();
   
   return (
     <main className="min-h-screen bg-gray-50">
@@ -74,8 +73,8 @@ export default function CategoryPage({ params }: CategoryPageProps) {
 }
 
 // Generate static paths for all categories
-export function generateStaticParams() {
-  const categories = getDocCategories();
+export async function generateStaticParams() {
+  const categories = await fetchDocCategories();
   return categories.map((category) => ({
     categoryId: category.id,
   }));

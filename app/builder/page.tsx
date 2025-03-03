@@ -460,6 +460,30 @@ export default function IndicatorBuilderPage() {
             <AiAssistant 
               initialContext={`WL8 indicator development for ${template} template with ${symbol}`} 
               placeholder="Describe the indicator you want to create..." 
+              onApplyCode={(code) => {
+                // Check if the code looks like C# (contains class, namespace, etc.)
+                const isCSharp = code.includes("namespace") || 
+                                code.includes("class") || 
+                                code.includes("using WealthLab");
+                
+                if (isCSharp) {
+                  // Update the WL8 code
+                  handleWL8CodeChange(code);
+                } else {
+                  // If it's not C#, it might be JavaScript, but we'll default to WL8
+                  // since that's the primary focus
+                  handleWL8CodeChange(code);
+                }
+              }}
+              onClearEditor={() => {
+                // Clear the editor
+                setWL8Code("");
+                setJSCode("");
+              }}
+              onReplaceEditor={(code) => {
+                // Replace the editor content
+                handleWL8CodeChange(code);
+              }}
             />
           </div>
         </div>

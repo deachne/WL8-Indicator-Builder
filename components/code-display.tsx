@@ -13,6 +13,8 @@ interface CodeDisplayProps {
   title?: string;
   readOnly?: boolean;
   onChange?: (value: string) => void;
+  onClear?: (clearFn: () => void) => void;
+  onReplace?: (replaceFn: (code: string) => void) => void;
 }
 
 // C# snippets and completions
@@ -73,7 +75,9 @@ export function CodeDisplay({
   language = "csharp", 
   title = "MyIndicator.cs",
   readOnly = true,
-  onChange
+  onChange,
+  onClear,
+  onReplace
 }: CodeDisplayProps) {
   const [isEditable, setIsEditable] = React.useState(!readOnly);
   const [codeValue, setCodeValue] = React.useState(code);
@@ -92,6 +96,30 @@ export function CodeDisplay({
       }
     }
   }, [code]);
+  
+  // Clear editor function
+  const clearEditor = () => {
+    if (editorRef.current) {
+      editorRef.current.setValue("");
+      setCodeValue("");
+      if (onChange) onChange("");
+    }
+  };
+
+  // Replace editor content function
+  const replaceEditorContent = (newCode: string) => {
+    if (editorRef.current) {
+      editorRef.current.setValue(newCode);
+      setCodeValue(newCode);
+      if (onChange) onChange(newCode);
+    }
+  };
+
+  // Expose methods via props
+  useEffect(() => {
+    if (onClear) onClear(clearEditor);
+    if (onReplace) onReplace(replaceEditorContent);
+  }, [onClear, onReplace]);
   
   const handleCopy = () => {
     navigator.clipboard.writeText(codeValue);

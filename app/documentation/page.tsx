@@ -2,13 +2,13 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { DocumentationLayout } from "@/components/documentation-layout";
 import { DocumentationNav } from "@/components/documentation-nav";
-import { getDocCategories, getDocNavItems } from "@/lib/documentation";
+import { fetchDocCategories, fetchDocNavItems } from "@/lib/documentation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 
-export default function DocumentationPage() {
-  const categories = getDocCategories();
-  const navItems = getDocNavItems();
+export default async function DocumentationPage() {
+  const categories = await fetchDocCategories();
+  const navItems = await fetchDocNavItems();
   
   return (
     <main className="min-h-screen bg-gray-50">

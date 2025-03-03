@@ -4,6 +4,10 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   images: { unoptimized: true },
+  // Enable React Server Components
+  experimental: {
+    serverActions: true,
+  },
 };
 
 module.exports = nextConfig;

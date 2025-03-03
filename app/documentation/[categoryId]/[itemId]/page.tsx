@@ -2,9 +2,8 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { DocumentationLayout } from "@/components/documentation-layout";
 import { DocumentationNav } from "@/components/documentation-nav";
-import { getDocCategories, getDocItem, getDocNavItems } from "@/lib/documentation";
+import { fetchDocItem, fetchDocNavItems, fetchDocCategory, fetchDocCategories } from "@/lib/documentation";
 import { MarkdownContent } from "@/components/markdown-content";
-import { AiAssistant } from "@/components/ai-assistant";
 import { notFound } from "next/navigation";
 
 interface ItemPageProps {
@@ -14,15 +13,16 @@ interface ItemPageProps {
   };
 }
 
-export default function ItemPage({ params }: ItemPageProps) {
+export default async function ItemPage({ params }: ItemPageProps) {
   const { categoryId, itemId } = params;
-  const item = getDocItem(itemId);
+  const item = await fetchDocItem(itemId);
   
-  if (!item || item.category !== categoryId) {
+  if (!item) {
     notFound();
   }
   
-  const navItems = getDocNavItems();
+  const category = await fetchDocCategory(categoryId);
+  const navItems = await fetchDocNavItems();
   
   return (
     <main className="min-h-screen bg-gray-50">
@@ -44,14 +44,17 @@ export default function ItemPage({ params }: ItemPageProps) {
       <DocumentationLayout
         sidebar={<DocumentationNav items={navItems} />}
       >
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-sm p-6 md:p-8">
-              <MarkdownContent content={item.content} />
-            </div>
+        <div className="grid gap-6">
+          <div className="text-sm breadcrumbs">
+            <ul className="flex space-x-2">
+              <li className="text-gray-500">Documentation</li>
+              <li className="text-gray-500 before:content-['/'] before:mr-2">{category?.title || categoryId}</li>
+              <li className="font-medium before:content-['/'] before:mr-2 before:text-gray-500">{item.title}</li>
+            </ul>
           </div>
-          <div className="lg:col-span-1">
-            <AiAssistant initialContext={`${item.title}: ${item.content.substring(0, 500)}`} placeholder="Ask about this documentation..." />
+          
+          <div className="prose prose-slate max-w-none dark:prose-invert">
+            <MarkdownContent content={item.content} />
           </div>
         </div>
       </DocumentationLayout>
@@ -62,18 +65,18 @@ export default function ItemPage({ params }: ItemPageProps) {
 }
 
 // Generate static paths for all items
-export function generateStaticParams() {
-  const categories = getDocCategories();
+export async function generateStaticParams() {
+  const categories = await fetchDocCategories();
   const paths: { categoryId: string; itemId: string }[] = [];
   
-  categories.forEach((category) => {
-    category.items.forEach((item) => {
+  for (const category of categories) {
+    for (const item of category.items) {
       paths.push({
         categoryId: category.id,
         itemId: item.id,
       });
-    });
-  });
+    }
+  }
   
   return paths;
 }

@@ -92,6 +92,39 @@ Key features of the code-aware processing:
 - The system can retrieve code examples based on their relevance to the query
 - Code examples are presented with their explanatory text for better understanding
 
+## AI Task Routing
+
+The project now includes an intelligent AI task routing system that selects the most appropriate AI model based on the type of query:
+
+- **Code Generation Tasks**: Uses Anthropic's Claude 3.5 Sonnet, which excels at writing and modifying code
+- **Conceptual Questions**: Uses Anthropic's Claude 3 Sonnet/Opus, which provides better explanations and reasoning
+
+This ensures that users get the best possible responses for their specific needs. The system automatically detects the intent of the query and routes it to the appropriate model.
+
+### Setting Up API Keys
+
+The project requires API keys for both OpenAI and Anthropic:
+
+1. **OpenAI API Key**: Get one from [OpenAI's platform](https://platform.openai.com/api-keys)
+2. **Anthropic API Key**: Get one from [Anthropic's console](https://console.anthropic.com/)
+
+Add both keys to your `.env` file:
+```
+OPENAI_API_KEY=your_openai_api_key
+ANTHROPIC_API_KEY=your_anthropic_api_key
+```
+
+For detailed instructions on setting up the Anthropic API key, see the [ANTHROPIC_SETUP.md](./ANTHROPIC_SETUP.md) file.
+
+### Testing API Connections
+
+To verify that your API keys are working correctly, run:
+```bash
+npm run test-api-keys
+```
+
+This will test the connections to both OpenAI and Anthropic APIs and provide feedback on any issues.
+
 ## Scripts
 
 - `npm run dev`: Start the development server
@@ -102,6 +135,7 @@ Key features of the code-aware processing:
 - `npm run chroma`: Start the ChromaDB server
 - `npm run chroma:import`: Start the ChromaDB server and import documentation
 - `npm run import-chroma`: Import documentation into ChromaDB (requires the ChromaDB server to be running)
+- `npm run test-api-keys`: Test connections to OpenAI and Anthropic APIs
 
 ## Project Structure
 

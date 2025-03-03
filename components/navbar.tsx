@@ -73,6 +73,15 @@ export function Navbar() {
             >
               <Icon name="fa-question-circle" className="mr-2 h-4 w-4" /> Q&A
             </Link>
+            <Link
+              href="/settings"
+              className={cn(
+                "py-2 text-white hover:text-teal-300 transition-all flex items-center",
+                isActive("/settings") && "text-teal-300"
+              )}
+            >
+              <Icon name="fa-cog" className="mr-2 h-4 w-4" /> Settings
+            </Link>
           </div>
 
           {/* Search Bar */}
@@ -143,6 +152,15 @@ export function Navbar() {
               )}
             >
               <Icon name="fa-question-circle" className="mr-2 h-4 w-4" /> Q&A
+            </Link>
+            <Link
+              href="/settings"
+              className={cn(
+                "py-2 text-white hover:text-teal-300 transition-all flex items-center",
+                isActive("/settings") && "text-teal-300"
+              )}
+            >
+              <Icon name="fa-cog" className="mr-2 h-4 w-4" /> Settings
             </Link>
             <form onSubmit={handleSearch} className="flex items-center bg-gray-700 rounded-full px-3 py-1 mt-2">
               <input
